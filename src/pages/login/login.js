@@ -80,7 +80,10 @@ export default function Login({ navigation }) {
 
     return (
         <View style={styles.ContainerAll}>
-            <Header/>
+            <Header
+                navigation = { navigation }
+                menu = {false}
+            />
             <View style={styles.Container}>
                 <H3
                     msg={"Faça seu Login:"}    

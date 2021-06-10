@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, TextInput, Text, View, Alert,Image, Dimensions, TouchableOpacity, ScrollView  } from "react-native";
+import { StyleSheet, TextInput, Text, View, Alert,Image, Dimensions, TouchableOpacity, ScrollView , CheckBox } from "react-native";
 import IconAntDesign from "react-native-vector-icons/AntDesign";
 import IconIonicons from "react-native-vector-icons/Ionicons";
 import { ButtonOutlinedE, ButtonSolidE } from "../../components/componentButtons/button";
-import { H1, H3, H4, H5, H6 } from "../../components/componentText/text";
+import { H1, H2, H3, H4, H5, H6 } from "../../components/componentText/text";
 import Footer from "../../components/footer/footer";
 import colors from '../../public/globalColors'
 
@@ -14,6 +14,12 @@ export default function Login({ navigation }) {
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");
     const [password, setPassword] = useState("");
+    const [userName, setUserName] = useState("");
+    const [cidade, setCidade] = useState("");
+    const [facebook, setFacebook] = useState("");
+    const [instagram, setInstagram] = useState("");
+    const [checkFacebook, setCheckFacebook] = useState(false);
+    const [checkInstagram, setCheckInstagram] = useState(false);
     const [confirmPassword, setConfirmPassword] = useState("");
     const [errorEmail, setErrorEmail] = useState(false);
     const [errorName, setErrorName] = useState(false);
@@ -181,15 +187,136 @@ export default function Login({ navigation }) {
                         secureTextEntry={true}
                     />
 
+                    <H6
+                        msg={"Qual vai ser seu nome de usuário?"}
+                        stl = {[{
+                            marginTop: 10,
+                            marginBottom:5,
+                            width:'80%',
+                            textAlign:'left',
+                        }]}
+                    />
+                    
+                    <TextInput
+                        style={[styles.Input]}
+                        onChangeText={(text) => setUserName(text)}
+                        value={userName}
+                    
+                    />
+                    <H6
+                        msg={"Em qual cidade você está?"}
+                        stl = {[{
+                            marginTop: 10,
+                            marginBottom:5,
+                            width:'80%',
+                            textAlign:'left',
+                        }]}
+                    />
+                    
+                    <TextInput
+                        style={[styles.Input]}
+                        onChangeText={(text) => setCidade(text)}
+                        value={cidade}
+                    
+                    />
+
+                    <H6
+                        msg={"Informar conta no Facebook"}
+                        stl = {[{
+                            marginTop: 10,
+                            marginBottom:5,
+                            width:'80%',
+                            textAlign:'left',
+                        }]}
+                    />
+                    
+                    <TextInput
+                        style={[styles.Input]}
+                        onChangeText={(text) => setFacebook(text)}
+                        value={facebook}
+                    
+                    />
+
+                    <H6
+                        msg={"Informar conta no Instagram"}
+                        stl = {[{
+                            marginTop: 10,
+                            marginBottom:5,
+                            width:'80%',
+                            textAlign:'left',
+                        }]}
+                    />
+                    
+                    <TextInput
+                        style={[styles.Input]}
+                        onChangeText={(text) => setInstagram(text)}
+                        value={instagram}
+                    
+                    />
+
+                    <H6
+                        msg={"Exibir no meu perfil público:"}
+                        stl = {[{
+                            marginTop: 10,
+                            marginBottom:15,
+                            width:'80%',
+                            textAlign:'left',
+                        }]}
+                    />
+
+                    <View>
+                        <View style={styles.checkbox}>
+                        <CheckBox
+
+                            value={checkFacebook}
+                            onValueChange={setCheckFacebook}
+                            
+                        />
+                            
+                            <H6
+                                msg={"Facebook"}
+                                stl = {[{color : colors.base_2,marginTop: 7}]}
+                            /> 
+                        </View>
+                        <View style={styles.checkbox}>
+                            <CheckBox
+                                value={checkInstagram}
+                                onValueChange={setCheckInstagram}
+                            />
+                            <H6
+                                msg={"Instagram"}
+                                stl = {[{color : colors.base_2,marginTop: 7}]}
+                            /> 
+                        </View>
+                    </View>
+                    
+
                     <TouchableOpacity
                         onPress={Create}
-                        style={{alignItems:'center', marginLeft:'-10%'}}
+                        style={{alignItems:'center', marginLeft:'-10%', marginBottom:15}}
                     >
-                        <ButtonSolidE
-                            msg={"Cadastrar"}
-                            stl={{marginTop:20, fontSize:20,width: 170,}}                        
+                        <ButtonOutlinedE
+                            msg={"Cadastrar-se no MatchBook"}
+                            stl={{marginTop:20, fontSize:15,}}                        
                         />
                     </TouchableOpacity>
+
+                    <TouchableOpacity 
+                        style={[{display:'flex',flexDirection:'row', paddingLeft:40}]}
+                        onPress={()=> navigation.navigate('Login')}
+                    >
+                        <H4
+                            msg={"Já tem uma conta?"}
+                            stl={{marginBottom:20, fontSize:15,}}    
+                        />
+                        <H4
+                            msg={" Faça login."}
+                            stl={{color: colors.secondary_2, fontSize:15, }}  
+                            
+                        />
+
+                    </TouchableOpacity>
+                    
             
                 
             </ScrollView>
@@ -280,5 +407,10 @@ const styles = StyleSheet.create({
         top: 266,
         left: 45,
         zIndex: 4,
-    },
+    },checkbox:{
+        display:'flex',
+        flexDirection:'row',
+        marginBottom: 5
+        
+    }
 });

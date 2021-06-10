@@ -43,6 +43,10 @@ export default function Home({ navigation }) {
 
     return (
         <View >
+            <Header
+                navigation = { navigation }
+                menu = {true}
+            />
            <Text style={{marginTop:30}}>
                id: {registrationId}
            </Text>

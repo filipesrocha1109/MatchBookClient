@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, TextInput, Text, View, Alert,Image, Dimensions, TouchableOpacity, ScrollView  } from "react-native";
 import IconAntDesign from "react-native-vector-icons/AntDesign";
+import Feather from "react-native-vector-icons/Feather";
 import IconIonicons from "react-native-vector-icons/Ionicons";
 import { ButtonOutlinedE, ButtonSolidE } from "../../components/componentButtons/button";
 import { H1, H3, H4, H5, H6 } from "../../components/componentText/text";
 import Footer from "../../components/footer/footer";
 import colors from '../../public/globalColors'
+
 
 import Header from '../../components/header/header';
 import Global from "../../public/Global";
@@ -57,6 +59,8 @@ export default function Login({ navigation }) {
       //            console.error(error);
       //        });
       //}
+
+      navigation.navigate("Matchbook")
 
     };
 
@@ -180,11 +184,11 @@ export default function Login({ navigation }) {
                             },errorConfirmPassword ? {color:'red'} : ""]}
                         />
 
-                        <IconAntDesign
-                            name="clouduploado"
-                            size={50}
-                            color="black"
-                            style={{marginLeft: -70, marginTop:25}}
+                        <Feather
+                            name="upload"
+                            size={30}
+                            color={colors.primary_3}
+                            style={{marginLeft: -70, marginTop:35}}
                             onPress={upload}
                             
                         />
