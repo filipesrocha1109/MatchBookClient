@@ -6,7 +6,8 @@ import IconIonicons from "react-native-vector-icons/Ionicons";
 import { ButtonOutlinedE, ButtonSolidE } from "../../components/componentButtons/button";
 import { H1, H3, H4, H5, H6 } from "../../components/componentText/text";
 import Footer from "../../components/footer/footer";
-import colors from '../../public/globalColors'
+import colors from '../../public/globalColors';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 
 import Header from '../../components/header/header';
@@ -106,118 +107,125 @@ export default function Login({ navigation }) {
     return (
         <View style={styles.ContainerAll}>
             <Header/>
-            <View style={styles.Container}>
-                <H3
-                    msg={"Configure seu perfil para explorar o catálogo de livros."}    
-                    stl = {{
-                        marginTop: 15,
-                        marginBottom:20,
-                        width:'80%',
-                        textAlign:'center',
-                        
-                    }}
-                />
+            <KeyboardAwareScrollView keyboardShouldPersistTaps="padding"
+            style={{ backgroundColor: 'white' }}
+            contentContainerStyle={{
+                flexGrow: 1
+            }}>
+    
+                <View style={styles.Container}>
 
-                <ScrollView 
-                    style={styles.scroll}
-                    keyboardShouldPersistTaps='always'
-                >
-
-                    <H6
-                        msg={"Qual é o titulo do livro?"}
-                        stl = {[{
-                            marginTop: 10,
-                            marginBottom:5,
+                    <H3
+                        msg={"Configure seu perfil para explorar o catálogo de livros."}    
+                        stl = {{
+                            marginTop: 15,
+                            marginBottom:20,
                             width:'80%',
-                            textAlign:'left',
-                        },errorName ? {color:'red'} : ""]}
-                    />
-                    
-                    <TextInput
-                        style={[styles.Input, errorName ? {borderColor:'red'} : ""]}
-                        onChangeText={(text) => setName(text)}
-                        value={name}
-                        
+                            textAlign:'center',
+                            
+                        }}
                     />
 
-                    <H6
-                        msg={"Qual é o genêro do livro?"}
-                        stl = {[{
-                            marginTop: 10,
-                            marginBottom:5,
-                            width:'80%',
-                            textAlign:'left',
-                        },errorEmail ? {color:'red'} : ""]}
-                    />
-                    
-                    <TextInput
-                        style={[styles.Input, errorEmail ? {borderColor:'red'} : ""]}
-                        onChangeText={(text) => setEmail(text)}
-                        value={email}
-                    />
+                    <ScrollView 
+                        style={styles.scroll}
+                        keyboardShouldPersistTaps='always'
+                    >     
 
-                    <H6
-                        msg={"Qual o nome do autor do livro?"}
-                        stl = {[{
-                            marginTop: 10,
-                            marginBottom:5,
-                            width:'80%',
-                            textAlign:'left',
-                        },errorPassword ? {color:'red'} : ""]}
-                    />
-                    
-                    <TextInput
-                        style={[styles.Input, errorPassword ? {borderColor:'red'} : ""]}
-                        onChangeText={(text) => setPassword(text)}
-                        value={password}
-                        secureTextEntry={true}
-                    />
-
-                    <View style={{flexDirection: "row",}}>
                         <H6
-                            msg={"Adicionar a capa do livro."}
+                            msg={"Qual é o titulo do livro?"}
                             stl = {[{
-                                marginTop: 40,
+                                marginTop: 10,
                                 marginBottom:5,
                                 width:'80%',
                                 textAlign:'left',
-                            },errorConfirmPassword ? {color:'red'} : ""]}
+                            },errorName ? {color:'red'} : ""]}
                         />
-
-                        <Feather
-                            name="upload"
-                            size={30}
-                            color={colors.primary_3}
-                            style={{marginLeft: -70, marginTop:35}}
-                            onPress={upload}
+                        
+                        <TextInput
+                            style={[styles.Input, errorName ? {borderColor:'red'} : ""]}
+                            onChangeText={(text) => setName(text)}
+                            value={name}
                             
                         />
 
-                    </View>
-
-                    <H6
-                        msg={"arquivo-teste.jpg"}
-                        stl = {{
-                            marginTop: -10,
-                            marginBottom:5,
-                            width:'80%',
-                            textAlign:'left',
-                            color: colors.secondary_2
-                        }}
-                    />
-                    <TouchableOpacity
-                        onPress={Create}
-                        style={{alignItems:'center', marginLeft:'-10%'}}
-                    >
-                        <ButtonSolidE
-                            msg={"Configurar perfil"}
-                            stl={{marginTop:20, fontSize:20,width: 220,}}                        
+                        <H6
+                            msg={"Qual é o genêro do livro?"}
+                            stl = {[{
+                                marginTop: 10,
+                                marginBottom:5,
+                                width:'80%',
+                                textAlign:'left',
+                            },errorEmail ? {color:'red'} : ""]}
                         />
-                    </TouchableOpacity>
-            
-                
-            </ScrollView>
-            </View>
+                        
+                        <TextInput
+                            style={[styles.Input, errorEmail ? {borderColor:'red'} : ""]}
+                            onChangeText={(text) => setEmail(text)}
+                            value={email}
+                        />
+
+                        <H6
+                            msg={"Qual o nome do autor do livro?"}
+                            stl = {[{
+                                marginTop: 10,
+                                marginBottom:5,
+                                width:'80%',
+                                textAlign:'left',
+                            },errorPassword ? {color:'red'} : ""]}
+                        />
+                        
+                        <TextInput
+                            style={[styles.Input, errorPassword ? {borderColor:'red'} : ""]}
+                            onChangeText={(text) => setPassword(text)}
+                            value={password}
+                            secureTextEntry={true}
+                        />
+
+                        <View style={{flexDirection: "row",}}>
+                            <H6
+                                msg={"Adicionar a capa do livro."}
+                                stl = {[{
+                                    marginTop: 40,
+                                    marginBottom:5,
+                                    width:'80%',
+                                    textAlign:'left',
+                                },errorConfirmPassword ? {color:'red'} : ""]}
+                            />
+
+                            <Feather
+                                name="upload"
+                                size={30}
+                                color={colors.primary_3}
+                                style={{marginLeft: -70, marginTop:35}}
+                                onPress={upload}
+                                
+                            />
+
+                        </View>
+
+                        <H6
+                            msg={"arquivo-teste.jpg"}
+                            stl = {{
+                                marginTop: -10,
+                                marginBottom:5,
+                                width:'80%',
+                                textAlign:'left',
+                                color: colors.secondary_2
+                            }}
+                        />
+                        <TouchableOpacity
+                            onPress={Create}
+                            style={{alignItems:'center', marginLeft:'-10%'}}
+                        >
+                            <ButtonSolidE
+                                msg={"Configurar perfil"}
+                                stl={{marginTop:20, fontSize:20,width: 220,}}                        
+                            />
+                        </TouchableOpacity>
+
+                    </ScrollView>
+                </View>
+            </KeyboardAwareScrollView>
             <Footer/>
         </View>
     );

@@ -15,30 +15,34 @@ export default function DrawerContent(props) {
 
 			<View style={styles.top}>	
 
-					<Text
-						style={[styles.item,{marginTop: -5}]}
-						onPress={() => navigation.navigate('Matchbook', { screen: 'Home' })}
-					>
-						Home
-					</Text>
-				
+				<Text
+					style={[styles.item,{marginTop: -5}]}
+					onPress={() => navigation.navigate('Matchbook', { screen: 'Home' })}
+				>
+					Home
+				</Text>				
 				<Text
 					style={styles.item}
+					onPress={() => navigation.navigate('Matchbook', { screen: 'MyBooks' })}
+				>
+					Meus Livros
+				</Text>
+			
+				<Text
+					style={styles.item}
+					onPress={() => navigation.navigate('Matchbook', { screen: 'MyMatchs' })}
 				>
 					Meus "Matchs"
 				</Text>
 				<Text
 					style={styles.item}
+					onPress={() => navigation.navigate('Matchbook', { screen: 'Preferencia' })}
 				>
 					Preferências
 				</Text>
 				<Text
 					style={styles.item}
-				>
-					Perfil
-				</Text>
-				<Text
-					style={styles.item}
+					onPress={() => navigation.navigate('Login', { screen: 'Login' })}
 				>
 					Logout
 				</Text>

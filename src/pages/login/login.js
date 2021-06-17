@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, TextInput, Text, View, Alert,Image, Dimensions, TouchableOpacity  } from "react-native";
-import IconAntDesign from "react-native-vector-icons/AntDesign";
-import IconIonicons from "react-native-vector-icons/Ionicons";
 import { ButtonOutlinedE, ButtonSolidE } from "../../components/componentButtons/button";
 import { H1, H3, H4, H5, H6 } from "../../components/componentText/text";
 import Footer from "../../components/footer/footer";
 import colors from '../../public/globalColors'
 import Global from '../../public/Global'
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 import Header from '../../components/header/header';
 
@@ -85,6 +84,7 @@ export default function Login({ navigation }) {
                 menu = {false}
             />
             <View style={styles.Container}>
+                
                 <H3
                     msg={"Faça seu Login:"}    
                     stl = {{
