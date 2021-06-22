@@ -15,7 +15,7 @@ export default function Routes() {
     return (
         <NavigationContainer>
             <Drawer.Navigator 
-                initialRouteName="Login"  
+                initialRouteName="Matchbook"  
                 
                 drawerStyle={{width: 200, height:240, borderRadius:15, borderColor:colors.base_2, borderWidth:5, marginTop:50 }}
                 drawerContent={(props) => <CustomDrawer {...props} />}      
