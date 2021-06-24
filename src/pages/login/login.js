@@ -25,6 +25,41 @@ export default function Login({ navigation }) {
         }
     };
 
+    const newBook = (token) => {
+
+        fetch(Global.ServerIP + "/haveBooks", {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization:  "Bearer " + token
+            }
+        })
+            .then((response) => response.text())
+            .then((responseText) => {
+                responseText = JSON.parse(responseText);
+                if (responseText.success) {
+                    if(responseText.data){
+                        navigation.navigate('Matchbook', { screen: 'Home' })
+                    }else{
+                        navigation.navigate("Config");
+                    }
+                } 
+                else 
+                {
+                    setErros(responseText.message);
+                    Alert.alert(
+                        erros, "error"                      
+                    );
+                }
+                
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+        
+    }
+
 
     const Login = () => {      
         if (user && password) {
@@ -55,7 +90,7 @@ export default function Login({ navigation }) {
                         //console.log(responseText.data.id)
                         //console.log(responseText.data.token)
                         //navigation.navigate("Matchbook");
-                        navigation.navigate("Config");
+                        newBook(responseText.data.token)
                     } 
                     else 
                     {

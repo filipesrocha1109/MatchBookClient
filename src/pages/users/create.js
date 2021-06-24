@@ -25,8 +25,8 @@ export default function Login({ navigation }) {
     const [errorName, setErrorName] = useState(false);
     const [errorPassword, setErrorPassword] = useState(false);
     const [errorConfirmPassword, setErrorConfirmPassword] = useState(false);
-
     const [erros, setErros] = useState("");
+    const cidades = Global.cidades;
 
     const Create = () => {
 
@@ -41,14 +41,15 @@ export default function Login({ navigation }) {
                     userName: email,
                     name: name,
                     email: email,
-                    password: password
+                    password: password,
+                    city : "Porto Alegre"
                 }),
             })
                 .then((response) => response.text())
                 .then((responseText) => {
                     responseText = JSON.parse(responseText);
                     if (responseText.success) {
-                          navigation.navigate("Login");
+                        CreateConfig(responseText.data.token);
                     } 
                     else 
                     {
@@ -65,6 +66,52 @@ export default function Login({ navigation }) {
         }
 
     };
+
+    const CreateConfig = (value) => {
+
+        fetch(Global.ServerIP + "/profile", {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization:  "Bearer " + value
+            },
+            body: JSON.stringify({               
+                socialMediaI : "instagram",
+                userSocialI: instagram,
+                visibleI: checkInstagram,
+                socialMediaF : "facebook",
+                userSocialF: facebook,
+                visibleF: checkFacebook
+            }),
+            
+        })
+            .then((response) => response.text())
+            .then((responseText) => {
+                responseText = JSON.parse(responseText);
+                if (responseText.success) {
+
+                    console.log(responseText)
+
+                    navigation.navigate("Login");
+                } 
+                else 
+                {
+                    setErros(responseText.message);
+                    Alert.alert(
+                        erros, "error"                      
+                    );
+                }
+            
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+        
+
+    };
+    
+    
 
     const Validate = () =>{
         var resp = false;
@@ -187,22 +234,7 @@ export default function Login({ navigation }) {
                         secureTextEntry={true}
                     />
 
-                    <H6
-                        msg={"Qual vai ser seu nome de usuário?"}
-                        stl = {[{
-                            marginTop: 10,
-                            marginBottom:5,
-                            width:'80%',
-                            textAlign:'left',
-                        }]}
-                    />
-                    
-                    <TextInput
-                        style={[styles.Input]}
-                        onChangeText={(text) => setUserName(text)}
-                        value={userName}
-                    
-                    />
+
                     <H6
                         msg={"Em qual cidade você está?"}
                         stl = {[{

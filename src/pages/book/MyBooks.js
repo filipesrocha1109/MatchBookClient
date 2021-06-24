@@ -18,6 +18,9 @@ export default function MyBooks({ navigation }) {
 
     const [ registrationId, setRegistrationId] = useState("");
     const [ registrationToken, setRegistrationToken] = useState("");
+    const [ book, setBook] = useState([]);
+
+
 
     useEffect(() => {
         getData()
@@ -35,6 +38,7 @@ export default function MyBooks({ navigation }) {
             if (registration_id && registration_token ) {
                 setRegistrationId(registration_id);
                 setRegistrationToken(registration_token);
+                getBook(registration_token);
             } else {
                 //() => navigation.navigate("Login");
             }
@@ -43,8 +47,41 @@ export default function MyBooks({ navigation }) {
         }
     };
 
+    const getBook = (token) =>{
+
+        fetch(Global.ServerIP + "/book", {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization:  "Bearer " + token
+            }
+        })
+            .then((response) => response.text())
+            .then((responseText) => {
+                responseText = JSON.parse(responseText);
+                if (responseText.success) {
+                    setBook(responseText.data)
+                } 
+                else 
+                {
+                    Alert.alert(
+                        responseText.message, "error"                      
+                    );
+                }
+              
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }
+
     const goBack = () => {
         navigation.goBack()
+    }
+
+    const create = () => {
+        navigation.navigate('Login', { screen: 'Config' })
     }
  
     return (
@@ -76,31 +113,45 @@ export default function MyBooks({ navigation }) {
                     />
                 </View>
 
-                <ListMyBooks
-                    img  = "livro.png"
-                    title = "Titulo do Livro 1"
-                    livroID = "1"
-                    navigation = { navigation }   
-                    match = { false }           
-                />
+                {                  
+                    book.length>0 ?
+                            
+                        book.map(({
+                                    id,
+                                    category,
+                                    name
+                                    
 
-                <ListMyBooks
-                    img  = "livro.png"
-                    title = "Titulo do Livro 2"
-                    livroID = "2"
-                    navigation = { navigation }     
-                    match = { false }           
-                />
+                                })=>{
+                                        return(
+                                            <ListMyBooks
+                                                img  = "livro.png"
+                                                key = {id}
+                                                title = {name}
+                                                livroID = {id}
+                                                navigation = { navigation }   
+                                                match = { false }           
+                                            />
+                                            )   
+                                        })
+                                        :                     
+                                <Text/>                    
+                        }   
 
-                <ListMyBooks
-                    img  = "livro.png"
-                    title = "Titulo do Livro 3"
-                    livroID = "3"
-                    navigation = { navigation }  
-                    match = { false }              
-                />
+                
 
             </ScrollView>
+            <View
+                    style={{position:'absolute',zIndex:1,bottom:30, right:35}}
+                >
+                    <AntDesign 
+                        name='pluscircle'
+                        size={50} 
+                        color= {colors.secondary_2}
+                        onPress={() => create()}
+                    /> 
+            </View>
+
             <Footer/>         
         </View>
     );

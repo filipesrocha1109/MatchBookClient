@@ -16,10 +16,67 @@ import { color } from "react-native-reanimated";
 
 export default function ShowBook({ route , navigation }) {
 
+    const [ registrationId, setRegistrationId] = useState("");
+    const [ registrationToken, setRegistrationToken] = useState("");
     const { bookID, match } = route.params;
+    const [ book, setBook] = useState({});
+    
+
+    useEffect(() => {
+        getData()
+    }, []);
 
 
-    console.log(navigation)
+    const getData = async () => {
+        try {
+            const registration_id = await AsyncStorage.getItem(
+                "@registration_id"
+            );
+            const registration_token = await AsyncStorage.getItem(
+                "@registration_token"
+            );
+            if (registration_id && registration_token ) {
+                setRegistrationId(registration_id);
+                setRegistrationToken(registration_token);
+                getBook(registration_token);
+            } else {
+                //() => navigation.navigate("Login");
+            }
+        } catch (e) {
+            Alert.alert(e);
+        }
+    };
+
+    const getBook = (token) =>{
+
+        fetch(Global.ServerIP + "/book?id="+bookID, {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization:  "Bearer " + token
+            }
+        })
+            .then((response) => response.text())
+            .then((responseText) => {
+                responseText = JSON.parse(responseText);
+                if (responseText.success) {
+                    console.log(responseText.data)
+                    setBook(responseText.data);
+                } 
+                else 
+                {
+                    Alert.alert(
+                        responseText.message, "error"                      
+                    );
+                }
+              
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }
+
 
     const goBack = () => {
         navigation.goBack()
@@ -92,7 +149,7 @@ export default function ShowBook({ route , navigation }) {
                             stl={{color: colors.base_1 ,fontSize: 17 }}
                         />
                         <H4
-                            msg={'Alex Rider'}
+                            msg={book.name}
                             stl={{color: colors.base_1,fontWeight:'bold' }}
                         />
                     </View>
@@ -105,7 +162,7 @@ export default function ShowBook({ route , navigation }) {
                             stl={{color: colors.base_1 ,fontSize: 17 }}
                         />
                         <H4
-                            msg={'Ação'}
+                            msg={book.category}
                             stl={{color: colors.base_1,fontWeight:'bold' }}
                         />
                     </View>
@@ -118,7 +175,7 @@ export default function ShowBook({ route , navigation }) {
                             stl={{color: colors.base_1 ,fontSize: 17 }}
                         />
                         <H4
-                            msg={'Anthony Horowitz'}
+                            msg={book.author}
                             stl={{color: colors.base_1,fontWeight:'bold' }}
                         />
                     </View>

@@ -8,89 +8,105 @@ import { H1, H3, H4, H5, H6 } from "../../components/componentText/text";
 import Footer from "../../components/footer/footer";
 import colors from '../../public/globalColors';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import AntDesign  from "react-native-vector-icons/AntDesign";
 
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import Header from '../../components/header/header';
 import Global from "../../public/Global";
 
 export default function Login({ navigation }) {
-    const [email, setEmail] = useState("");
+    const [genero, setGenero] = useState("");
     const [name, setName] = useState("");
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [errorEmail, setErrorEmail] = useState(false);
+    const [autor, setAutor] = useState("");
+    const [errorGenero, setErrorGenero] = useState(false);
     const [errorName, setErrorName] = useState(false);
-    const [errorPassword, setErrorPassword] = useState(false);
-    const [errorConfirmPassword, setErrorConfirmPassword] = useState(false);
+    const [errorAutor, setErrorAutor] = useState(false);
+    const [registrationId, setRegistrationId] = useState("");
+    const [registrationToken, setRegistrationToken] = useState("");
+   
 
     const [erros, setErros] = useState("");
 
+    useEffect(() => {
+        getData()
+    }, []);
+
+    const getData = async () => {
+        try {
+            const registration_id = await AsyncStorage.getItem(
+                "@registration_id"
+            );
+            const registration_token = await AsyncStorage.getItem(
+                "@registration_token"
+            );
+            if (registration_id && registration_token ) {
+                setRegistrationId(registration_id);
+                setRegistrationToken(registration_token);
+                //newBook(registration_token)
+            } else {
+                //() => navigation.navigate("Login");
+            }
+        } catch (e) {
+            Alert.alert(e);
+        }
+    };
+
+
+
     const Create = () => {
 
-      //if(Validate()){
-      //    fetch(Global.ServerIP + "/register", {
-      //        method: "POST",
-      //        headers: {
-      //            Accept: "application/json",
-      //            "Content-Type": "application/json",
-      //        },
-      //        body: JSON.stringify({
-      //            userName: email,
-      //            name: name,
-      //            email: email,
-      //            password: password
-      //        }),
-      //    })
-      //        .then((response) => response.text())
-      //        .then((responseText) => {
-      //            responseText = JSON.parse(responseText);
-      //            if (responseText.success) {
-      //                  navigation.navigate("Login");
-      //            } 
-      //            else 
-      //            {
-      //                setErros(responseText.message);
-      //                Alert.alert(
-      //                    erros, "error"                      
-      //                );
-      //            }
-      //       
-      //        })
-      //        .catch((error) => {
-      //            console.error(error);
-      //        });
-      //}
+        if(Validate()){
+            fetch(Global.ServerIP + "/book", {
+                method: "POST",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                    Authorization:  "Bearer " + registrationToken
+                },
+                body: JSON.stringify({
+                    
+                    name: name,
+                    author: autor,
+                    category: genero
+                }),
+            })
+                .then((response) => response.text())
+                .then((responseText) => {
+                    responseText = JSON.parse(responseText);
+                    if (responseText.success) {
+                        navigation.navigate('Matchbook', { screen: 'Home' })
+                    } 
+                    else 
+                    {
+                        setErros(responseText.message);
+                        Alert.alert(
+                            erros, "error"                      
+                        );
+                    }
+                  
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        }
 
-      navigation.navigate("Matchbook")
+      
 
     };
 
     const Validate = () =>{
         var resp = false;
 
-        if(name && email && password && confirmPassword){
+        if(name && genero && autor ){
 
-            if(password == confirmPassword) {
-                resp = true;
-            }else{
-                if(!name){setErrorName(true)}else{setErrorName(false)};
-                if(!email){setErrorEmail(true)}else{setErrorEmail(false)};
-                if(!password){setErrorPassword(true)}else{setErrorPassword(false)};
-                if(!confirmPassword){setErrorConfirmPassword(true)}else{setErrorConfirmPassword(false)};
-                setErrorPassword(true);
-                setErrorConfirmPassword(true);
+            resp = true
 
-            }
-            
         }else{
             if(!name){setErrorName(true)}else{setErrorName(false)};
-            if(!email){setErrorEmail(true)}else{setErrorEmail(false)};
-            if(!password){setErrorPassword(true)}else{setErrorPassword(false)};
-            if(!confirmPassword){setErrorConfirmPassword(true)}else{setErrorConfirmPassword(false)};
-            if(password != confirmPassword) {
-                setErrorPassword(true);
-                setErrorConfirmPassword(true);
-            }
+            if(!genero){setErrorGenero(true)}else{setErrorGenero(false)};
+            if(!autor){setErrorAutor(true)}else{setErrorAutor(false)};
         }
 
         return resp
@@ -155,13 +171,13 @@ export default function Login({ navigation }) {
                                 marginBottom:5,
                                 width:'80%',
                                 textAlign:'left',
-                            },errorEmail ? {color:'red'} : ""]}
+                            },errorGenero ? {color:'red'} : ""]}
                         />
                         
                         <TextInput
-                            style={[styles.Input, errorEmail ? {borderColor:'red'} : ""]}
-                            onChangeText={(text) => setEmail(text)}
-                            value={email}
+                            style={[styles.Input, errorGenero ? {borderColor:'red'} : ""]}
+                            onChangeText={(text) => setGenero(text)}
+                            value={genero}
                         />
 
                         <H6
@@ -171,14 +187,14 @@ export default function Login({ navigation }) {
                                 marginBottom:5,
                                 width:'80%',
                                 textAlign:'left',
-                            },errorPassword ? {color:'red'} : ""]}
+                            },errorAutor ? {color:'red'} : ""]}
                         />
                         
                         <TextInput
-                            style={[styles.Input, errorPassword ? {borderColor:'red'} : ""]}
-                            onChangeText={(text) => setPassword(text)}
-                            value={password}
-                            secureTextEntry={true}
+                            style={[styles.Input, errorAutor ? {borderColor:'red'} : ""]}
+                            onChangeText={(text) => setAutor(text)}
+                            value={autor}
+
                         />
 
                         <View style={{flexDirection: "row",}}>
@@ -189,7 +205,7 @@ export default function Login({ navigation }) {
                                     marginBottom:5,
                                     width:'80%',
                                     textAlign:'left',
-                                },errorConfirmPassword ? {color:'red'} : ""]}
+                                }]}
                             />
 
                             <Feather
@@ -218,8 +234,8 @@ export default function Login({ navigation }) {
                             style={{alignItems:'center', marginLeft:'-10%'}}
                         >
                             <ButtonSolidE
-                                msg={"Configurar perfil"}
-                                stl={{marginTop:20, fontSize:20,width: 220,}}                        
+                                msg={"Adicionar Livro"}
+                                stl={{marginTop:20, fontSize:20,width: 220,textAlign:'center'}}                        
                             />
                         </TouchableOpacity>
 
@@ -238,6 +254,7 @@ const styles = StyleSheet.create({
     scroll:{
         width:'100%',
         paddingLeft:'10%',
+        
         
     },
     Input: {
