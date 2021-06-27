@@ -8,7 +8,9 @@ import { H1, H3, H4, H5, H6 } from "../../components/componentText/text";
 import Footer from "../../components/footer/footer";
 import colors from '../../public/globalColors';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { Picker } from '@react-native-picker/picker';
 import AntDesign  from "react-native-vector-icons/AntDesign";
+import * as ImagePicker from 'expo-image-picker';
 
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -25,13 +27,42 @@ export default function Login({ navigation }) {
     const [errorAutor, setErrorAutor] = useState(false);
     const [registrationId, setRegistrationId] = useState("");
     const [registrationToken, setRegistrationToken] = useState("");
+    const [localUri, setLocalUri] = useState("");
+    const [filename, setFilename] = useState("");
+    const [typeImg, setTypeImg] = useState("");
+    const generos = Global.generos;
    
 
     const [erros, setErros] = useState("");
 
     useEffect(() => {
-        getData()
-    }, []);
+        getData();
+        (async () => {
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (status !== 'granted') {
+              alert('Sorry, we need camera roll permissions to make this work!');
+            }         
+        })();            
+      }, []);
+
+
+    const Validate = () =>{
+        var resp = false;
+
+        if(name && genero && autor ){
+
+            resp = true
+
+        }else{
+            if(!name){setErrorName(true)}else{setErrorName(false)};
+            if(!genero){setErrorGenero(true)}else{setErrorGenero(false)};
+            if(!autor){setErrorAutor(true)}else{setErrorAutor(false)};
+        }
+
+        return resp
+        
+    }
+
 
     const getData = async () => {
         try {
@@ -76,7 +107,17 @@ export default function Login({ navigation }) {
                 .then((responseText) => {
                     responseText = JSON.parse(responseText);
                     if (responseText.success) {
-                        navigation.navigate('Matchbook', { screen: 'Home' })
+
+                        var bookID = responseText.data
+
+                        if(localUri && filename && typeImg){
+                            
+                            SendImage(bookID[0]);
+                            console.log('call sendImage')
+                        }else{
+                            navigation.navigate('Matchbook', { screen: 'Home' })
+                        }
+
                     } 
                     else 
                     {
@@ -92,31 +133,99 @@ export default function Login({ navigation }) {
                 });
         }
 
-      
+    };
+
+    const SendImage = ( bookID ) =>{
+
+        // Upload the image using the fetch and FormData APIs
+        let formData = new FormData();
+        // Assume "photo" is the name of the form field the server expects
+        //
+
+
+        console.log("filename ->" +filename)
+
+        //formData.append( "file", { uri:localUri, fileName:filename, type: typeImg });
+        //formData.append( { uri:localUri, fileName:filename, type: typeImg });
+        formData.append( "photo", { 
+            uri:localUri, 
+            fileName:filename, 
+            type: typeImg 
+        });
+        //formData.append( "file", localUri, filename, typeImg );
+        formData.append(localUri, filename );
+        //formData.append( "photo", localUri, filename, typeImg );
+        //formData.append( "photo", localUri, filename );
+//
+
+        console.log(formData);
+        
+        fetch(Global.ServerIP + "/photos?book_id=" + bookID, {
+            method: "POST",
+            headers: {
+                'content-type': 'multipart/form-data',
+                Authorization:  "Bearer " + registrationToken
+            },
+            body: formData,
+        })
+            .then((response) => response.text())
+            .then((responseText) => {
+                responseText = JSON.parse(responseText);
+                if (responseText.success) {
+
+                    console.log(responseText)
+                    //navigation.navigate('Matchbook', { screen: 'Home' })
+                } 
+                else 
+                {
+                    setErros(responseText.message);
+                    Alert.alert(
+                        erros, "error"                      
+                    );
+                }
+                
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+
+
+
 
     };
 
-    const Validate = () =>{
-        var resp = false;
 
-        if(name && genero && autor ){
 
-            resp = true
+    async function takeAndUploadPhotoAsync() {
 
-        }else{
-            if(!name){setErrorName(true)}else{setErrorName(false)};
-            if(!genero){setErrorGenero(true)}else{setErrorGenero(false)};
-            if(!autor){setErrorAutor(true)}else{setErrorAutor(false)};
-        }
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            //allowsEditing: true,
+            //aspect: [1, 1],
+            quality: 1,
+          });
+      
+        if (!result.cancelled) {
+            // ImagePicker salva a foto tirada no disco e retorna um URI local para ela
+            let parseLocalUri = result.uri;
+            
+            let resFilename = parseLocalUri.split('/');
 
-        return resp
+            let parseFilename = resFilename[resFilename.length -1]
         
-    }
+            // Inferir o tipo de imagem
+            let match = /\.(\w+)$/.exec(filename);
+            let parseType = match ? `image/${match[1]}` : `image`;
 
-    const upload = () =>{
-        Alert.alert(
-            "Upload da imagem", "Adicionando imagem ...."                      
-        );
+            setLocalUri(parseLocalUri);
+            setFilename(parseFilename);
+            setTypeImg(parseType); 
+
+            //console.log("parseLocalUri: " + parseLocalUri)
+            //console.log("parseFilename: " + parseFilename)
+            //console.log("parseType: " + parseType)
+        }
+      
     }
 
 
@@ -173,12 +282,25 @@ export default function Login({ navigation }) {
                                 textAlign:'left',
                             },errorGenero ? {color:'red'} : ""]}
                         />
-                        
-                        <TextInput
-                            style={[styles.Input, errorGenero ? {borderColor:'red'} : ""]}
-                            onChangeText={(text) => setGenero(text)}
-                            value={genero}
-                        />
+
+                        <TouchableOpacity style={ styles.Input }>
+                            <Picker
+                                selectedValue={genero}
+                                style={styles.Input}
+                                onValueChange={(itemValue) => 
+                                setGenero(itemValue)}                      
+                            >
+                                <Picker.Item label={"Selecione o genêro"} value={""} key={""}/>
+                                
+                                {
+                                    generos.map((item, index) => {
+                                        return (<Picker.Item label={item} value={item} key={index}/>) 
+                                    })
+                                }
+
+                                <Picker.Item label={"Outro genero"} value={"NF"} key={"NF"}/> 
+                            </Picker>
+                        </TouchableOpacity> 
 
                         <H6
                             msg={"Qual o nome do autor do livro?"}
@@ -213,18 +335,18 @@ export default function Login({ navigation }) {
                                 size={30}
                                 color={colors.primary_3}
                                 style={{marginLeft: -70, marginTop:35}}
-                                onPress={upload}
+                                onPress={() => takeAndUploadPhotoAsync()}
                                 
                             />
 
                         </View>
-
+                        
                         <H6
-                            msg={"arquivo-teste.jpg"}
+                            msg={filename}
                             stl = {{
                                 marginTop: -10,
                                 marginBottom:5,
-                                width:'80%',
+                                width:'50%',
                                 textAlign:'left',
                                 color: colors.secondary_2
                             }}
@@ -329,5 +451,15 @@ const styles = StyleSheet.create({
         top: 266,
         left: 45,
         zIndex: 4,
+    },
+    Input: {
+        height: 40,
+        width: "85%",
+        backgroundColor: "#ffff",
+        borderRadius: 25,
+        color: "#2C3382",
+        paddingLeft: 20,
+        borderWidth: 1,
+        borderColor: "#20232a",
     },
 });

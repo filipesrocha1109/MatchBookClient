@@ -4,6 +4,8 @@ import IconAntDesign from "react-native-vector-icons/AntDesign";
 import IconIonicons from "react-native-vector-icons/Ionicons";
 import { ButtonOutlinedE, ButtonSolidE } from "../../components/componentButtons/button";
 import { H1, H2, H3, H4, H5, H6 } from "../../components/componentText/text";
+import { Picker } from '@react-native-picker/picker';
+
 import Footer from "../../components/footer/footer";
 import colors from '../../public/globalColors'
 
@@ -27,6 +29,7 @@ export default function Login({ navigation }) {
     const [errorConfirmPassword, setErrorConfirmPassword] = useState(false);
     const [erros, setErros] = useState("");
     const cidades = Global.cidades;
+    //const cidades = ["viamão","Porto Alegre"];
 
     const Create = () => {
 
@@ -245,12 +248,25 @@ export default function Login({ navigation }) {
                         }]}
                     />
                     
-                    <TextInput
-                        style={[styles.Input]}
-                        onChangeText={(text) => setCidade(text)}
-                        value={cidade}
-                    
-                    />
+
+                    <TouchableOpacity style={ styles.Input }>
+                        <Picker
+                            selectedValue={cidade}
+                            style={styles.Input}
+                            onValueChange={(itemValue) => 
+                            setCidade(itemValue)}                      
+                        >
+                            <Picker.Item label={"Selecione a Cidade"} value={""} key={""}/>
+                            
+                            {
+                                cidades.map((item, index) => {
+                                    return (<Picker.Item label={item} value={item} key={index}/>) 
+                                })
+                            }
+
+                            <Picker.Item label={"Outra Cidade"} value={"NF"} key={"NF"}/> 
+                        </Picker>
+                    </TouchableOpacity> 
 
                     <H6
                         msg={"Informar conta no Facebook"}
@@ -360,6 +376,8 @@ export default function Login({ navigation }) {
 
 const windowHeight = Dimensions.get('window').height * 0.75;
 
+const widthScreen = Dimensions.get('window').width;
+
 
 const styles = StyleSheet.create({
     scroll:{
@@ -444,5 +462,15 @@ const styles = StyleSheet.create({
         flexDirection:'row',
         marginBottom: 5
         
-    }
+    },    
+    selectCidade: {
+        width: widthScreen * 0.83,
+        marginLeft:0,
+        backgroundColor: "#E5E5E5",
+        borderRadius: 5,
+        height: 50,
+        color: "black",
+        paddingLeft: 10
+        
+    },
 });
