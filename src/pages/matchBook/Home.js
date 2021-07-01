@@ -19,9 +19,11 @@ export default function Home({ navigation }) {
     const [ registrationId, setRegistrationId] = useState("");
     const [ registrationToken, setRegistrationToken] = useState("");
     const [ cardIndex, setcardIndex] = useState("");
+    const [books, setBooks] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        
+        getData()
     }, []);
 
     const scrollviewRef = useRef()
@@ -38,6 +40,7 @@ export default function Home({ navigation }) {
             if (registration_id && registration_token ) {
                 setRegistrationId(registration_id);
                 setRegistrationToken(registration_token);
+                getBooks(registration_token)
             } else {
                 //() => navigation.navigate("Login");
             }
@@ -45,52 +48,129 @@ export default function Home({ navigation }) {
             Alert.alert(e);
         }
     };
-    getData();
-
-    // stackSize => número de cards
-    // infinite => não ter fim os cards
-
-    
 
 
-    const books =[
-        {
-            titulo : "Alex Rider",
-            genero: "Ação",
-            autor: "Anthony Horowitz",
-            localizacao: "Porto Alegre"
-        },
-        {
-            titulo : "Menino do pijama listrado",
-            genero: "trajédia",
-            autor: "Anthony Horowitz",
-            localizacao: "Porto Alegre"
-        },
-        {
-            titulo : "A bela e a fera",
-            genero: "trajédia",
-            autor: "Anthony Horowitz",
-            localizacao: "Porto Alegre"
-        },
-        {
-            titulo : "Dracula",
-            genero: "trajédia",
-            autor: "Anthony Horowitz",
-            localizacao: "Porto Alegre"
-        }
-    ];
+    const getBooks = (token) =>{
+        
+        fetch(Global.ServerIP + "/home", {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization:  "Bearer " + token
+            }
+        })
+            .then((response) => response.text())
+            .then((responseText) => {
+                responseText = JSON.parse(responseText);
+                if (responseText.success) {
+                    if(responseText.data){
+
+                        setBooks(responseText.data)
+                        console.log(responseText.data)
+
+                        setLoading(false)
+                        
+
+                    }else{
+                        Alert.alert(
+                            "Deu chabu", "error"                      
+                        );
+                    }
+                } 
+                else 
+                {
+                    setErros(responseText.message);
+                    Alert.alert(
+                        "Deu chabu1", "error"                      
+                    );
+                }
+                
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+
+
+    }
 
     const matchOn = (value) =>{
-        console.log('================================================')
-        console.log('ON:' + value )
-        console.log(books[value])
-        console.log('================================================')
+
+        fetch(Global.ServerIP + "/home", {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization:  "Bearer " + registrationToken
+            },
+            body: JSON.stringify({
+                book_id : books[value].id,
+                liked : true
+
+            }),
+        })
+            .then((response) => response.text())
+            .then((responseText) => {
+                responseText = JSON.parse(responseText);
+                if (responseText.success) {
+                    if(responseText.data){
+
+                        console.log(responseText.data.Match)
+                    }
+                } 
+                else 
+                {
+                    setErros(responseText.message);
+                    Alert.alert(
+                        "Deu chabu1", "error"                      
+                    );
+                }
+                
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+        
+
     };
     const matchOff = (value) =>{
-        console.log('================================================')
-        console.log('OFF:' + value )
-        console.log(books[value])
-        console.log('================================================')
+        
+        fetch(Global.ServerIP + "/home", {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization:  "Bearer " + registrationToken
+            },
+            body: JSON.stringify({
+                book_id : books[value].id,
+                liked : false
+
+            }),
+        })
+            .then((response) => response.text())
+            .then((responseText) => {
+                responseText = JSON.parse(responseText);
+                if (responseText.success) {
+                    if(responseText.data){
+                   
+
+                    }
+                } 
+                else 
+                {
+                    setErros(responseText.message);
+                    Alert.alert(
+                        "Deu chabu1", "error"                      
+                    );
+                }
+                
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+        
+
     };
 
     const deck = useRef();
@@ -109,7 +189,13 @@ export default function Home({ navigation }) {
             <View
                 style={styles.swiper}
             >
-            
+            {
+                loading 
+                
+                ? 
+                <Text></Text>
+                :
+
                 <Swiper
                     ref={deck}
                     infinite
@@ -135,27 +221,30 @@ export default function Home({ navigation }) {
                                 <View>
                                     <View style={{display:'flex',flexDirection:'row',alignItems:'center', marginTop:2}}>
                                         <Text style={styles.h6} >Título: </Text>
-                                        <Text style={styles.h4} >{card.titulo}</Text>
+                                        <Text style={styles.h4} >{card.book}</Text>
                                     </View>
                                     <View style={{display:'flex',flexDirection:'row',alignItems:'center', marginTop:2}}>
                                         <Text style={styles.h6} >Genêro: </Text>
-                                        <Text style={styles.h4} >{card.genero}</Text>
+                                        <Text style={styles.h4} >{card.category}</Text>
                                     </View>
                                     <View style={{display:'flex',flexDirection:'row',alignItems:'center', marginTop:2}}>
                                         <Text style={styles.h6} >Autor: </Text>
-                                        <Text style={styles.h4} >{card.autor}</Text>
+                                        <Text style={styles.h4} >{card.author}</Text>
 
                                     </View>
                                     <View style={{display:'flex',flexDirection:'row',alignItems:'center', marginTop:2}}>
                                         <Text style={styles.h6} >Localização: </Text>
-                                        <Text style={styles.h4} >{card.localizacao}</Text>                                       
+                                        <Text style={styles.h4} >{card.city}</Text>                                       
                                     </View>                                                                           
                                 </View>                                                            
                             </View>
                         )
                     }}
                     
-                />    
+                />  
+
+            }
+            
 
             </View>
             
@@ -211,7 +300,7 @@ const styles = StyleSheet.create({
     },
     swiper:{
         //backgroundColor: colors.background_2,
-        backgroundColor:'red',
+        //backgroundColor:'red',
         height: windowHeight* 0.75,
         width:windowWidth,               
     },

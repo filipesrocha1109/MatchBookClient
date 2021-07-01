@@ -164,14 +164,11 @@ export default function Login({ navigation }) {
                     />
                 </TouchableOpacity>
                 
-                <H6
-                    msg={"Esqueceu sua senha ?"}
-                    stl={{color: colors.secondary_2, fontSize:18, marginTop:15}}
-                />
+                
                 
                 <H6
                     msg={"Não tem uma conta ?"}
-                    stl={{color: colors.secondary_2, fontSize:18, marginTop:15}}
+                    stl={{color: colors.secondary_2, fontSize:18, marginTop:40}}
 
                 />
 
