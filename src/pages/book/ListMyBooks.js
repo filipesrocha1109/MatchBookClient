@@ -22,7 +22,8 @@ export default function ListMyBooks( props ) {
     const title = props.title;
     const livroID = props.livroID;
     const navigation = props.navigation;
-    const match = props.match
+    const match = props.match;
+    const matchID = props.matchID;
 
     return (
         <View
@@ -33,7 +34,7 @@ export default function ListMyBooks( props ) {
             >
                 <Image
                     style={ styles.Img }
-                    source={require("../../assets/livro.png")}
+                    source={{ uri: img }}
                 />
             </View>                   
             <View
@@ -49,7 +50,7 @@ export default function ListMyBooks( props ) {
             >
                 <TouchableOpacity
                     style={{alignItems:'center'}}
-                    onPress={() => navigation.navigate('Matchbook', { screen: 'ShowBook', params: { bookID: livroID, match: match } })}
+                    onPress={() => navigation.navigate('Matchbook', { screen: 'ShowBook', params: { bookID: livroID, match: match, matchID : matchID } })}
                 >
                     <H4
                         msg={'Ver Livro'}

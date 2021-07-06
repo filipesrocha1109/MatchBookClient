@@ -18,11 +18,16 @@ export default function MyMatchs({ navigation }) {
 
     const [ registrationId, setRegistrationId] = useState("");
     const [ registrationToken, setRegistrationToken] = useState("");
+    const [ match, setMatch] = useState([]);
+
+
 
     useEffect(() => {
-        getData()
-    }, []);
-
+        const unsubscribe = navigation.addListener('focus', () => {
+          getData();
+        });
+        return unsubscribe;
+      }, [navigation]);
 
     const getData = async () => {
         try {
@@ -35,6 +40,7 @@ export default function MyMatchs({ navigation }) {
             if (registration_id && registration_token ) {
                 setRegistrationId(registration_id);
                 setRegistrationToken(registration_token);
+                getMatchs(registration_token);
             } else {
                 //() => navigation.navigate("Login");
             }
@@ -42,6 +48,37 @@ export default function MyMatchs({ navigation }) {
             Alert.alert(e);
         }
     };
+
+    const getMatchs = (token) =>{
+
+        fetch(Global.ServerIP + "/match", {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization:  "Bearer " + token
+            }
+        })
+            .then((response) => response.text())
+            .then((responseText) => {
+                responseText = JSON.parse(responseText);
+                if (responseText.success) {
+                    //console.log(responseText.data)
+
+                    setMatch(responseText.data)
+                } 
+                else 
+                {
+                    Alert.alert(
+                        responseText.message, "error"                      
+                    );
+                }
+              
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }
 
     const goBack = () => {
         navigation.goBack()
@@ -76,13 +113,33 @@ export default function MyMatchs({ navigation }) {
                     />
                 </View>
 
-                <ListMyBooks
-                    img  = "livro.png"
-                    title = "Titulo do Livro"
-                    livroID = "1"
-                    navigation = { navigation } 
-                    match = { true }             
-                /> 
+                {                  
+                    match.length>0 ?
+                            
+                    match.map(({
+                                    book_id,
+                                    category,
+                                    book,
+                                    photo,
+                                    id
+                                    
+
+                                })=>{
+                                        return(
+                                            <ListMyBooks
+                                                img  = {photo}
+                                                key = {id}
+                                                title = {book}
+                                                livroID = {book_id}
+                                                navigation = { navigation }   
+                                                match = { true }    
+                                                matchID = {id}       
+                                            />
+                                            )   
+                                        })
+                                        :                     
+                                <Text/>                    
+                        }   
 
             </ScrollView>
             <Footer/>         

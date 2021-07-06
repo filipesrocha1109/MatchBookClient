@@ -137,28 +137,14 @@ export default function Login({ navigation }) {
 
     const SendImage = ( bookID ) =>{
 
-        // Upload the image using the fetch and FormData APIs
-        let formData = new FormData();
-        // Assume "photo" is the name of the form field the server expects
-        //
-
-
-        console.log("filename ->" +filename)
-
-        //formData.append( "file", { uri:localUri, fileName:filename, type: typeImg });
-        //formData.append( { uri:localUri, fileName:filename, type: typeImg });
-        formData.append( "photo", { 
-            uri:localUri, 
-            fileName:filename, 
-            type: typeImg 
-        });
-        //formData.append( "file", localUri, filename, typeImg );
-        formData.append(localUri, filename );
-        //formData.append( "photo", localUri, filename, typeImg );
-        //formData.append( "photo", localUri, filename );
-//
-
-        console.log(formData);
+        var photo = {
+            uri: localUri,
+            type: 'image/jpeg',
+            name: filename,
+          };
+          
+          var formData = new FormData();
+          formData.append("file", photo);
         
         fetch(Global.ServerIP + "/photos?book_id=" + bookID, {
             method: "POST",
@@ -173,8 +159,8 @@ export default function Login({ navigation }) {
                 responseText = JSON.parse(responseText);
                 if (responseText.success) {
 
-                    console.log(responseText)
-                    //navigation.navigate('Matchbook', { screen: 'Home' })
+                    //console.log(responseText)
+                    navigation.navigate('Matchbook', { screen: 'Home' })
                 } 
                 else 
                 {
@@ -188,9 +174,6 @@ export default function Login({ navigation }) {
             .catch((error) => {
                 console.error(error);
             });
-
-
-
 
     };
 

@@ -18,11 +18,68 @@ export default function Preferencias({ navigation }) {
     
     const [cidade, setCidade] = useState("");
     const [generos, setGeneros] = useState([]);
+    const [ registrationId, setRegistrationId] = useState("");
+    const [ registrationToken, setRegistrationToken] = useState("");
+    const [ erros, setErros] = useState("");
+
     const cidades = Global.cidades;
     const generosList = Global.generos;
 
+    useEffect(() => {
+        getData()
+    }, []);
 
-    const getListGeneros = () => {
+    const getData = async () => {
+        try {
+            const registration_id = await AsyncStorage.getItem(
+                "@registration_id"
+            );
+            const registration_token = await AsyncStorage.getItem(
+                "@registration_token"
+            );
+            if (registration_id && registration_token ) {
+                setRegistrationId(registration_id);
+                setRegistrationToken(registration_token);
+                getListGeneros(registration_token);
+            } else {
+                //() => navigation.navigate("Login");
+            }
+        } catch (e) {
+            Alert.alert(e);
+        }
+    };
+
+    const getListGeneros = (token) => {
+
+
+        fetch(Global.ServerIP + "/preference", {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization:  "Bearer " + token
+            }
+        })
+            .then((response) => response.text())
+            .then((responseText) => {
+                responseText = JSON.parse(responseText);
+                if (responseText.success) {
+
+                    setGeneros(responseText.data.preferences)
+
+                } 
+                else 
+                {
+                    setErros(responseText.message);
+                    Alert.alert(
+                        erros, "error"                      
+                    );
+                }
+              
+            })
+            .catch((error) => {
+                console.error(error);
+            });
 
     }
 
@@ -36,8 +93,8 @@ export default function Preferencias({ navigation }) {
             },
             body: JSON.stringify({
                 
-                cidade : cidade,
-                generos : generos
+                preference : generos
+                
             }),
         })
             .then((response) => response.text())
@@ -45,15 +102,7 @@ export default function Preferencias({ navigation }) {
                 responseText = JSON.parse(responseText);
                 if (responseText.success) {
 
-                    var bookID = responseText.data
-
-                    if(localUri && filename && typeImg){
-                        
-                        SendImage(bookID[0]);
-                        console.log('call sendImage')
-                    }else{
-                        navigation.navigate('Matchbook', { screen: 'Home' })
-                    }
+                    navigation.navigate('Matchbook', { screen: 'Home' })
 
                 } 
                 else 
@@ -99,6 +148,28 @@ export default function Preferencias({ navigation }) {
         setGeneros(teste)
 
     } 
+
+
+    // <View>
+    //     <TouchableOpacity style={ [styles.Input, {marginTop:20, marginBottom:20} ] }>
+    //         <Picker
+    //             selectedValue={cidade}
+    //             style={styles.Input}
+    //             onValueChange={(itemValue) => 
+    //             setCidade(itemValue)}                      
+    //         >
+    //             <Picker.Item label={"Selecione a Cidade"} value={""} key={""}/>
+                
+    //             {
+    //                 cidades.map((item, index) => {
+    //                     return (<Picker.Item label={item} value={item} key={index}/>) 
+    //                 })
+    //             }
+
+    //             <Picker.Item label={"Outra Cidade"} value={"NF"} key={"NF"}/> 
+    //         </Picker>
+    //     </TouchableOpacity>                   
+    // </View> 
 
  
     return (
@@ -164,33 +235,14 @@ export default function Preferencias({ navigation }) {
 
                 </View>
 
-                <View>
-                    <TouchableOpacity style={ [styles.Input, {marginTop:20, marginBottom:20} ] }>
-                        <Picker
-                            selectedValue={cidade}
-                            style={styles.Input}
-                            onValueChange={(itemValue) => 
-                            setCidade(itemValue)}                      
-                        >
-                            <Picker.Item label={"Selecione a Cidade"} value={""} key={""}/>
-                            
-                            {
-                                cidades.map((item, index) => {
-                                    return (<Picker.Item label={item} value={item} key={index}/>) 
-                                })
-                            }
-
-                            <Picker.Item label={"Outra Cidade"} value={"NF"} key={"NF"}/> 
-                        </Picker>
-                    </TouchableOpacity>                   
-                </View> 
+                
 
                 <TouchableOpacity
                     onPress={() => savePreference() }
                 >
                     <ButtonSolidE
                         msg={"Salvar Preferências"}
-                        stl={{ marginTop:10}}
+                        stl={{ marginTop:20}}
                     />
                 </TouchableOpacity>
 

@@ -13,6 +13,7 @@ import ListBook from '../matchBook/ListBook';
 import Swiper from "react-native-deck-swiper";
 
 import Header from '../../components/header/header';
+import { set } from "react-native-reanimated";
 
 export default function Home({ navigation }) {
 
@@ -23,8 +24,11 @@ export default function Home({ navigation }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        getData()
-    }, []);
+        const unsubscribe = navigation.addListener('focus', () => {
+          getData();
+        });
+        return unsubscribe;
+      }, [navigation]);
 
     const scrollviewRef = useRef()
 
@@ -69,8 +73,11 @@ export default function Home({ navigation }) {
                         setBooks(responseText.data)
                         console.log(responseText.data)
 
-                        setLoading(false)
-                        
+                        var arr = responseText.data;
+
+                        if(arr.length != 0){
+                            setLoading(false)
+                        }
 
                     }else{
                         Alert.alert(
@@ -105,18 +112,26 @@ export default function Home({ navigation }) {
             },
             body: JSON.stringify({
                 book_id : books[value].id,
-                liked : true
+                liked : true,
+                user_id : books[value].user_id
 
             }),
         })
             .then((response) => response.text())
             .then((responseText) => {
                 responseText = JSON.parse(responseText);
-                if (responseText.success) {
-                    if(responseText.data){
+                if (responseText.success) {                
 
-                        console.log(responseText.data.Match)
+                    if(responseText.data.Match){
+                        Alert.alert(
+                            "deu Match", "beeeeeei"                      
+                        );
                     }
+                    
+                    if(value == books.length-1){
+                        setLoading(true)
+                    }
+                    
                 } 
                 else 
                 {
@@ -134,6 +149,8 @@ export default function Home({ navigation }) {
 
     };
     const matchOff = (value) =>{
+
+        console.log(books[value])
         
         fetch(Global.ServerIP + "/home", {
             method: "POST",
@@ -144,25 +161,20 @@ export default function Home({ navigation }) {
             },
             body: JSON.stringify({
                 book_id : books[value].id,
-                liked : false
+                liked : false,
+                user_id : books[value].user_id
 
             }),
         })
             .then((response) => response.text())
             .then((responseText) => {
-                responseText = JSON.parse(responseText);
-                if (responseText.success) {
-                    if(responseText.data){
-                   
+                responseText = JSON.parse(responseText)
+                if(responseText.success){
 
+                    if(value == books.length-1){
+                        setLoading(true)
                     }
-                } 
-                else 
-                {
-                    setErros(responseText.message);
-                    Alert.alert(
-                        "Deu chabu1", "error"                      
-                    );
+
                 }
                 
             })
@@ -193,12 +205,20 @@ export default function Home({ navigation }) {
                 loading 
                 
                 ? 
-                <Text></Text>
+                
+                    <View style={styles.notFound}>
+                        <Text style={styles.notFoundText}>
+
+                            SEM LIVROS
+                        
+                        </Text>
+
+
+                    </View>
                 :
 
                 <Swiper
                     ref={deck}
-                    infinite
                     swipeBackCard
                     stackSize={1}
                     cards={books}
@@ -215,7 +235,7 @@ export default function Home({ navigation }) {
                                 <View style={styles.containerImg} >
                                     <Image
                                         style={ styles.Img }
-                                        source={require("../../assets/livro.png")}
+                                        source={{ uri: card.photo }}
                                     />
                                 </View>
                                 <View>
@@ -249,23 +269,33 @@ export default function Home({ navigation }) {
             </View>
             
             
-            
-            <View style={styles.PreviusPage}>
-                <Feather
-                    name={'arrow-left-circle'}
-                    color={'red'}
-                    size={35}
-                    onPress={()=> {deck.current.swipeRight()}}                    
-                   />
-            </View>
-            <View style={styles.NextPage}>
-                <Feather
-                    name={'arrow-right-circle'}
-                    color={'green'}
-                    size={35}
-                    onPress={()=> { deck.current.swipeLeft()}}
-                />
-            </View>
+            {
+
+                loading ?
+
+                <View/>
+
+                :
+                <>
+
+                    <View style={styles.PreviusPage}>
+                        <Feather
+                            name={'arrow-left-circle'}
+                            color={'red'}
+                            size={35}
+                            onPress={()=> {deck.current.swipeRight()}}                    
+                        />
+                    </View>
+                    <View style={styles.NextPage}>
+                        <Feather
+                            name={'arrow-right-circle'}
+                            color={'green'}
+                            size={35}
+                            onPress={()=> { deck.current.swipeLeft()}}
+                        />
+                    </View>
+                </>
+            }
 
             <Footer/>  
 
@@ -338,5 +368,17 @@ const styles = StyleSheet.create({
         fontSize: 13,
         color: '#000000',
         color: colors.base_2
+    },
+    notFound:{
+        justifyContent:'center',
+        alignContent:'center',
+        alignItems:'center',
+        //backgroundColor: 'red',
+        height: '100%'
+    },
+    notFoundText:{
+        color:'#9E0E0E',
+        fontSize:40
     }
+
 })

@@ -23,8 +23,12 @@ export default function MyBooks({ navigation }) {
 
 
     useEffect(() => {
-        getData()
-    }, []);
+        const unsubscribe = navigation.addListener('focus', () => {
+          getData();
+        });
+        return unsubscribe;
+      }, [navigation]);
+
 
 
     const getData = async () => {
@@ -61,6 +65,8 @@ export default function MyBooks({ navigation }) {
             .then((responseText) => {
                 responseText = JSON.parse(responseText);
                 if (responseText.success) {
+                    //console.log(responseText.data)
+
                     setBook(responseText.data)
                 } 
                 else 
@@ -119,13 +125,14 @@ export default function MyBooks({ navigation }) {
                         book.map(({
                                     id,
                                     category,
-                                    name
+                                    name,
+                                    photo
                                     
 
                                 })=>{
                                         return(
                                             <ListMyBooks
-                                                img  = "livro.png"
+                                                img  = {photo}
                                                 key = {id}
                                                 title = {name}
                                                 livroID = {id}

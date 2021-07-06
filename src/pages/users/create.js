@@ -94,7 +94,7 @@ export default function Login({ navigation }) {
                 responseText = JSON.parse(responseText);
                 if (responseText.success) {
 
-                    console.log(responseText)
+                    //console.log(responseText)
 
                     navigation.navigate("Login");
                 } 

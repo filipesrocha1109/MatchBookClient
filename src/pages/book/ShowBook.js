@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef, createRef } from "react";
 import { StyleSheet, TextInput, Text, View, Alert,Image, Dimensions, ScrollView  } from "react-native";
 import AntDesign  from "react-native-vector-icons/AntDesign";
+import FontAwesome5  from "react-native-vector-icons/FontAwesome5";
+
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import IconIonicons from "react-native-vector-icons/Ionicons";
 import { ButtonOutlinedE, ButtonSolidE } from "../../components/componentButtons/button";
@@ -18,8 +20,9 @@ export default function ShowBook({ route , navigation }) {
 
     const [ registrationId, setRegistrationId] = useState("");
     const [ registrationToken, setRegistrationToken] = useState("");
-    const { bookID, match } = route.params;
+    const { bookID, match, matchID  } = route.params;
     const [ book, setBook] = useState({});
+    const [ matchObj, setMatchObj] = useState({});
     
 
     useEffect(() => {
@@ -38,7 +41,12 @@ export default function ShowBook({ route , navigation }) {
             if (registration_id && registration_token ) {
                 setRegistrationId(registration_id);
                 setRegistrationToken(registration_token);
-                getBook(registration_token);
+                if(!match){
+                    getBook(registration_token);
+                }else{
+                    getMatch(registration_token);
+                }
+                
             } else {
                 //() => navigation.navigate("Login");
             }
@@ -61,7 +69,7 @@ export default function ShowBook({ route , navigation }) {
             .then((responseText) => {
                 responseText = JSON.parse(responseText);
                 if (responseText.success) {
-                    console.log(responseText.data)
+                    //console.log(responseText.data)
                     setBook(responseText.data);
                 } 
                 else 
@@ -75,6 +83,139 @@ export default function ShowBook({ route , navigation }) {
             .catch((error) => {
                 console.error(error);
             });
+    }
+
+    const getMatch = (token) =>{
+
+        fetch(Global.ServerIP + "/match?id="+matchID, {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization:  "Bearer " + token
+            }
+        })
+            .then((response) => response.text())
+            .then((responseText) => {
+                responseText = JSON.parse(responseText);
+                if (responseText.success) {
+                    console.log(responseText.data)
+                    setMatchObj(responseText.data);
+                } 
+                else 
+                {
+                    Alert.alert(
+                        responseText.message, "error"                      
+                    );
+                }
+              
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }
+
+    const ButtonremoveBook = () => {
+        Alert.alert(
+            "Remover o Livro",
+            "Deseja realmente excluir o Livro.\nEssa ação é irreversivel!",
+            [
+              {
+                text: "Cancel",
+              },
+              { text: "OK", 
+                onPress: () => RemoveBook() 
+            }
+            ]
+          );
+
+    }
+
+    const ButtonremoveMatch = () => {
+        Alert.alert(
+            "Remover o Match",
+            "Deseja realmente excluir o Match.\nEssa ação é irreversivel!",
+            [
+              {
+                text: "Cancel",
+              },
+              { text: "OK", 
+                onPress: () => RemoveMatch() 
+            }
+            ]
+          );
+
+    }
+
+    const RemoveBook = () => {
+
+
+        fetch(Global.ServerIP + "/book?id="+bookID, {
+            method: "DELETE",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization:  "Bearer " + registrationToken
+            }
+        })
+            .then((response) => response.text())
+            .then((responseText) => {
+                responseText = JSON.parse(responseText);
+                if (responseText.success) {
+
+                    navigation.navigate('Matchbook', { screen: 'MyBooks' })
+                    
+                } 
+                else 
+                {
+                    Alert.alert(
+                        responseText.message, "error"                      
+                    );
+                }
+              
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+
+
+    }
+
+    const RemoveMatch = () => {
+
+
+        fetch(Global.ServerIP + "/match?id="+matchID, {
+            method: "DELETE",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization:  "Bearer " + registrationToken
+            }
+        })
+            .then((response) => response.text())
+            .then((responseText) => {
+
+                console.log(responseText)
+
+                responseText = JSON.parse(responseText);
+                if (responseText.success) {
+
+                    navigation.navigate('Matchbook', { screen: 'MyMatchs' })
+                    
+                } 
+                else 
+                {
+                    Alert.alert(
+                        responseText.message, "error"                      
+                    );
+                }
+              
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+
+
     }
 
 
@@ -96,6 +237,16 @@ export default function ShowBook({ route , navigation }) {
                         size={30} 
                         color= {colors.secondary_2}
                         onPress={() => goBack()}
+                    /> 
+                </View>
+                <View
+                    style={{position:'absolute',zIndex:5,top:105, right:15}}
+                >
+                    <FontAwesome5 
+                        name='trash'
+                        size={30} 
+                        color= {'red'}
+                        onPress={() => match ? ButtonremoveMatch() : ButtonremoveBook()}
                     /> 
                 </View>
             <ScrollView
@@ -129,7 +280,7 @@ export default function ShowBook({ route , navigation }) {
                 >
                     <Image
                     style={ styles.Img }
-                    source={require("../../assets/livro.png")}
+                    source={{ uri: match ? matchObj.photo : book.photo }}
                 />
                 </View>
                 <View
@@ -149,7 +300,7 @@ export default function ShowBook({ route , navigation }) {
                             stl={{color: colors.base_1 ,fontSize: 17 }}
                         />
                         <H4
-                            msg={book.name}
+                            msg={match ? matchObj.book : book.name}
                             stl={{color: colors.base_1,fontWeight:'bold' }}
                         />
                     </View>
@@ -162,7 +313,7 @@ export default function ShowBook({ route , navigation }) {
                             stl={{color: colors.base_1 ,fontSize: 17 }}
                         />
                         <H4
-                            msg={book.category}
+                            msg={match ? matchObj.category : book.category}
                             stl={{color: colors.base_1,fontWeight:'bold' }}
                         />
                     </View>
@@ -175,7 +326,7 @@ export default function ShowBook({ route , navigation }) {
                             stl={{color: colors.base_1 ,fontSize: 17 }}
                         />
                         <H4
-                            msg={book.author}
+                            msg={match ? matchObj.author : book.author}
                             stl={{color: colors.base_1,fontWeight:'bold' }}
                         />
                     </View>
@@ -188,7 +339,7 @@ export default function ShowBook({ route , navigation }) {
                             stl={{color: colors.base_1 ,fontSize: 17 }}
                         />
                         <H4
-                            msg={'Porto Alegre'}
+                            msg={match ? matchObj.city : book.city}
                             stl={{color: colors.base_1,fontWeight:'bold' }}
                         />
                     </View>
@@ -215,7 +366,7 @@ export default function ShowBook({ route , navigation }) {
                                 stl={{color: colors.base_1 ,fontSize: 17 }}
                             />
                             <H4
-                                msg={'Maria'}
+                                msg={matchObj.name}
                                 stl={{color: colors.base_1,fontWeight:'bold' }}
                             />
                         </View>
@@ -228,36 +379,60 @@ export default function ShowBook({ route , navigation }) {
                                 stl={{color: colors.base_1 ,fontSize: 17 }}
                             />
                             <H4
-                                msg={'Maria@gmail.com'}
+                                msg={matchObj.email}
                                 stl={{color: colors.base_1,fontWeight:'bold' }}
                             />
                         </View>
+                        {
 
-                        <View
-                            style={{display:'flex', flexDirection:'row'}}
-                        >
-                            <H5
-                                msg={'Facebook: '}
-                                stl={{color: colors.base_1 ,fontSize: 17 }}
-                            />
-                            <H4
-                                msg={''}
-                                stl={{color: colors.base_1,fontWeight:'bold' }}
-                            />
-                        </View>
+                            matchObj.show_facebook ?
 
-                        <View
-                            style={{display:'flex', flexDirection:'row'}}
-                        >
-                            <H5
-                                msg={'Instagram: '}
-                                stl={{color: colors.base_1 ,fontSize: 17 }}
-                            />
-                            <H4
-                                msg={''}
-                                stl={{color: colors.base_1,fontWeight:'bold' }}
-                            />
-                        </View>
+                                <View
+                                    style={{display:'flex', flexDirection:'row'}}
+                                >
+                                    <H5
+                                        msg={'Facebook: '}
+                                        stl={{color: colors.base_1 ,fontSize: 17 }}
+                                    />
+                                    <H4
+                                        msg={matchObj.facebook}
+                                        stl={{color: colors.base_1,fontWeight:'bold' }}
+                                    />
+                                </View>
+
+                                :
+                                <View/>
+
+                        }
+
+
+                        {
+
+                            matchObj.show_instagram ?
+
+                                <View
+                                style={{display:'flex', flexDirection:'row'}}
+                                >
+                                    <H5
+                                        msg={'Instagram: '}
+                                        stl={{color: colors.base_1 ,fontSize: 17 }}
+                                    />
+                                    <H4
+                                        msg={matchObj.instagram}
+                                        stl={{color: colors.base_1,fontWeight:'bold' }}
+                                    />
+                                </View>
+
+                                :
+
+                                <View/>
+
+
+                        }
+
+                        
+
+                       
                     </View>
                     :
 
