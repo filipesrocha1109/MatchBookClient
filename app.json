@@ -24,7 +24,11 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "permissions":["CAMERA","MEDIA_LIBRARY"]
+      "permissions": [
+        "CAMERA",
+        "MEDIA_LIBRARY"
+      ],
+      "package": "com.filipe.rocha.silveira.MatchBookClient"
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -11,6 +11,7 @@ import Global from '../../public/Global'
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ListBook from '../matchBook/ListBook';
 import Swiper from "react-native-deck-swiper";
+import Modal from 'react-native-modal'
 
 import Header from '../../components/header/header';
 import { set } from "react-native-reanimated";
@@ -22,6 +23,7 @@ export default function Home({ navigation }) {
     const [ cardIndex, setcardIndex] = useState("");
     const [books, setBooks] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [ visible, setVisible] = useState(false);
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
@@ -45,6 +47,10 @@ export default function Home({ navigation }) {
                 setRegistrationId(registration_id);
                 setRegistrationToken(registration_token);
                 getBooks(registration_token)
+
+
+
+
             } else {
                 //() => navigation.navigate("Login");
             }
@@ -71,7 +77,7 @@ export default function Home({ navigation }) {
                     if(responseText.data){
 
                         setBooks(responseText.data)
-                        console.log(responseText.data)
+                        //console.log(responseText.data)
 
                         var arr = responseText.data;
 
@@ -100,7 +106,6 @@ export default function Home({ navigation }) {
 
 
     }
-
     const matchOn = (value) =>{
 
         fetch(Global.ServerIP + "/home", {
@@ -123,9 +128,11 @@ export default function Home({ navigation }) {
                 if (responseText.success) {                
 
                     if(responseText.data.Match){
-                        Alert.alert(
-                            "deu Match", "beeeeeei"                      
-                        );
+                        setVisible(true);
+
+                        setTimeout(function() {
+                            setVisible(false);
+                        }, 2000)
                     }
                     
                     if(value == books.length-1){
@@ -198,9 +205,37 @@ export default function Home({ navigation }) {
                 navigation = { navigation }
                 menu = {true}
             />
+            
             <View
                 style={styles.swiper}
             >
+            <View >
+                <Modal
+                    isVisible={visible}
+                    animationType ='slide'
+                    
+                >
+                    <View
+                        style={styles.containerModal}
+                    >                  
+                        <Image
+                            source={require('../../assets/check.png')}
+                            style={{width:155,height:160}}
+                        />
+                        <Text
+                            style={styles.textMatchModal}
+                        >
+                            Match
+                        </Text>
+                    </View>
+                </Modal>             
+            </View>
+
+
+
+
+
+
             {
                 loading 
                 
@@ -231,6 +266,8 @@ export default function Home({ navigation }) {
                     renderCard={(card)=>{
                         return(
                             <View style={styles.containerSwiper}>
+
+                                
 
                                 <View style={styles.containerImg} >
                                     <Image
@@ -379,6 +416,23 @@ const styles = StyleSheet.create({
     notFoundText:{
         color:'#9E0E0E',
         fontSize:40
+    },
+    containerModal:{
+        backgroundColor:'#CECECE', 
+        height:250,
+        marginBottom:60,
+        borderRadius:20,
+        padding:20,
+        alignItems:'center',
+        justifyContent:'center'
+
+    },
+    textMatchModal:{
+        fontSize:35,
+        fontWeight:'bold',
+        color:'white',
+        marginLeft:-5
+
     }
 
 })

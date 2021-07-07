@@ -113,7 +113,7 @@ export default function Login({ navigation }) {
                         if(localUri && filename && typeImg){
                             
                             SendImage(bookID[0]);
-                            console.log('call sendImage')
+                            //console.log('call sendImage')
                         }else{
                             navigation.navigate('Matchbook', { screen: 'Home' })
                         }

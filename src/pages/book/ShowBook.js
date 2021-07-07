@@ -99,7 +99,7 @@ export default function ShowBook({ route , navigation }) {
             .then((responseText) => {
                 responseText = JSON.parse(responseText);
                 if (responseText.success) {
-                    console.log(responseText.data)
+                    //console.log(responseText.data)
                     setMatchObj(responseText.data);
                 } 
                 else 
@@ -195,7 +195,7 @@ export default function ShowBook({ route , navigation }) {
             .then((response) => response.text())
             .then((responseText) => {
 
-                console.log(responseText)
+                //console.log(responseText)
 
                 responseText = JSON.parse(responseText);
                 if (responseText.success) {

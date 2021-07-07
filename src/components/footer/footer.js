@@ -16,6 +16,10 @@ const styles = StyleSheet.create({
 
     Container: {
         backgroundColor: colors.primary_1,
-        height : 70,      
+        height : 70,  
+        //position:'absolute',
+        bottom:0
+ 
+            
     },
 });
